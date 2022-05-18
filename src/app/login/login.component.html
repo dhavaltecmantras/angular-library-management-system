@@ -1,23 +1,58 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 login-image">
-      <img src="../../assets/login-image.jpg" class="login-window"/>
+      <img src="../../assets/login-image.jpg" class="login-window" />
     </div>
     <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-      <div class="offset-lg-3 col-lg-6 login-box" style="margin-top: 25%;">
-        <div class="form-group">
-          <b><label>User Name/Email:</label></b>
-          <input type="text" class="form-control"/>
-        </div>
-        <div class="form-group mt-2">
-          <b><label>Password:</label></b>
-          <input type="password" class="form-control"/>
-        </div>
-        <div class="form-group mt-4">
-          <button class="btn btn-primary w-100">
-            Login
-          </button>
-        </div>
+      <div class="offset-lg-3 col-lg-6 login-box" style="margin-top: 25%">
+        <form name="form" [formGroup]="loginForm" (ngSubmit)="doLogin()">
+          <div class="form-group">
+            <b><label>Email Address:</label></b>
+            <input
+              type="text"
+              formControlName="email"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f['email'].errors }"
+            />
+            <div
+              *ngIf="submitted && f['email'].errors"
+              class="invalid-feedback"
+            >
+              <div *ngIf="f['email'].errors['required']">
+                Email ID is required
+              </div>
+              <div *ngIf="f['email'].errors['email']">
+                Email must be a valid email address
+              </div>
+            </div>
+          </div>
+          <div class="form-group mt-2">
+            <b><label>Password:</label></b>
+            <input
+              type="password"
+              formControlName="password"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
+            />
+            <div
+              *ngIf="submitted && f['password'].errors"
+              class="invalid-feedback"
+            >
+              <div *ngIf="f['password'].errors['required']">
+                Password is required
+              </div>
+              <div *ngIf="f['password'].errors['minLength']">
+                Minimum length must be 8 chars.
+              </div>
+              <div *ngIf="f['password'].errors['maxLength']">
+                Maxminum length must be 16 chars.
+              </div>
+            </div>
+          </div>
+          <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
