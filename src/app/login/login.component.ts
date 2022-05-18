@@ -1,6 +1,9 @@
+import { AuthService } from './../_services/auth.service';
+import { TokenStorageService } from './../_services/token-storage.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +14,22 @@ export class LoginComponent implements OnInit {
   loginForm: any;
   submitted = false;
   toaster: ToastrService;
-  constructor(private formBuilder: FormBuilder, toaster: ToastrService) {
+  loginFormData = {
+    email: '',
+    password: '',
+  };
+  errorMessage = '';
+  isLoggedIn = false;
+  isLoginFailed = false;
+  roles: string[] = [];
+
+  constructor(
+    private formBuilder: FormBuilder,
+    toaster: ToastrService,
+    private tokenStorage: TokenStorageService,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.toaster = toaster;
   }
 
@@ -27,6 +45,11 @@ export class LoginComponent implements OnInit {
         ],
       ],
     });
+
+    if (this.tokenStorage.getToken()) {
+      this.isLoggedIn = true;
+      this.roles = this.tokenStorage.getUser().role;
+    }
   }
 
   get f() {
@@ -39,5 +62,22 @@ export class LoginComponent implements OnInit {
       this.toaster.error('All fields are required.');
       return;
     }
+
+    const { email, password } = this.loginFormData;
+    this.authService.login(email, password).subscribe(
+      (data) => {
+        this.tokenStorage.saveToken(data.token);
+        this.tokenStorage.saveUser(data);
+        this.isLoginFailed = false;
+        this.isLoggedIn = true;
+        this.roles = this.tokenStorage.getUser().user.role;
+        this.router.navigate(['/dashboard']);
+      },
+      (error) => {
+        this.errorMessage = error.error.message;
+        this.toaster.error(error.error.message);
+        this.isLoginFailed = true;
+      }
+    );
   }
 }
