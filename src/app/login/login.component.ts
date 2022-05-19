@@ -48,7 +48,8 @@ export class LoginComponent implements OnInit {
 
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
-      this.roles = this.tokenStorage.getUser().role;
+      this.roles = this.tokenStorage.getUser().user.role;
+      this.navigateToDashboard();
     }
   }
 
@@ -56,7 +57,7 @@ export class LoginComponent implements OnInit {
     return this.loginForm.controls;
   }
 
-  doLogin() {
+  doLogin(){
     this.submitted = true;
     if (this.loginForm.invalid) {
       this.toaster.error('All fields are required.');
@@ -71,7 +72,7 @@ export class LoginComponent implements OnInit {
         this.isLoginFailed = false;
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().user.role;
-        this.router.navigate(['/dashboard']);
+        this.navigateToDashboard();
       },
       (error) => {
         this.errorMessage = error.error.message;
@@ -79,5 +80,9 @@ export class LoginComponent implements OnInit {
         this.isLoginFailed = true;
       }
     );
+  }
+
+  navigateToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

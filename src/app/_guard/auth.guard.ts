@@ -14,12 +14,14 @@ import { Observable } from 'rxjs';
 })
 export class AuthGuard implements CanActivate {
   userDetails = {
-    success: false
+    success: false,
   };
+
   constructor(
     private tokenStorage: TokenStorageService,
     private router: Router
   ) {}
+
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot

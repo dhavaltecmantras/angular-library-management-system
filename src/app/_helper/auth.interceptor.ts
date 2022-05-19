@@ -8,7 +8,8 @@ import {
   HTTP_INTERCEPTORS,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-const TOKEN_HEADER_KEY = 'hseEzY2spBO6HmNcrErBpxTiidRVBaV0Db2mAeIVKT78KVFsBUshxHgPGopjTptL';
+// const TOKEN_HEADER_KEY = 'hseEzY2spBO6HmNcrErBpxTiidRVBaV0Db2mAeIVKT78KVFsBUshxHgPGopjTptL';
+const TOKEN_HEADER_KEY = '';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(private token: TokenStorageService) {}
@@ -21,10 +22,10 @@ export class AuthInterceptor implements HttpInterceptor {
     const token = this.token.getToken();
     if (token != null) {
       authRequest = request.clone({
-        headers: request.headers.set(TOKEN_HEADER_KEY, 'Bearer ' + token),
+        headers: request.headers.set('Authorization', 'Bearer ' + token),
       });
     }
-    return next.handle(request);
+    return next.handle(authRequest);
   }
 }
 
