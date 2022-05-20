@@ -3,7 +3,6 @@ import { environment } from './../../environments/environment';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 const API_URL = `${environment.apiUrl}`;
-// const HTTP_OPTIONS = `${environment.headers}`;
 
 const HTTP_OPTIONS = {
   headers: new HttpHeaders({
@@ -26,5 +25,17 @@ export class BookService {
 
   getBookDetails(): Observable<any> {
     return this.http.get(API_URL + 'get-book-details', HTTP_OPTIONS);
+  }
+
+  getBookDetailsById(id: number): Observable<any> {
+    return this.http.get(`${API_URL}get-book-details-by-id/${id}`, HTTP_OPTIONS);
+  }
+
+  deleteBookDetails(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}delete-book-details/${id}`, HTTP_OPTIONS);
+  }
+
+  updateBookDetails(data: any): Observable<any> {
+    return this.http.post(API_URL + 'update-book-details', data, HTTP_OPTIONS);
   }
 }
