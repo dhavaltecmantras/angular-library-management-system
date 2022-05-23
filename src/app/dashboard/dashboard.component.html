@@ -1,13 +1,21 @@
 <div class="container-fluid">
   <div class="row w-100">
     <div class="col-lg-12">
-      <app-header></app-header>
+      <app-header [userName]="userName"></app-header>
     </div>
   </div>
-  <div class="row">
-    <div class="col-lg-3">wewegwfwegwegweg</div>
-    <div class="col-lg-9" style="margin-top: 5%">
-      <div class="card">
+  <div class="row" *ngIf="this.userDetails.user.role == 1">
+    <div
+      class="col-lg-3 mb-3 d-flex align-items-stretch"
+      style="margin-top: 5%"
+    >
+      <div class="card h-100"></div>
+    </div>
+    <div
+      class="col-lg-9 mb-3 d-flex align-items-stretch"
+      style="margin-top: 5%"
+    >
+      <div class="card h-100">
         <div class="card-header">
           <h5 class="card-title">Library Management</h5>
         </div>
@@ -22,7 +30,11 @@
           <br />
           <div class="row">
             <div class="col-lg-12">
-              <kendo-grid [data]="gridData">
+              <kendo-grid
+                [data]="gridData"
+                [pageSize]="5"
+                [pageable]="true"
+              >
                 <kendo-grid-column field="id" title="ID"> </kendo-grid-column>
                 <kendo-grid-column field="book_name" title="Book Name">
                 </kendo-grid-column>
@@ -73,7 +85,7 @@
     <form
       name="form"
       [formGroup]="addBookDetailsForm"
-      (ngSubmit)="(action == 'insert') ? addBookDetails() : updateBookDetails()"
+      (ngSubmit)="action == 'insert' ? addBookDetails() : updateBookDetails()"
     >
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -82,7 +94,12 @@
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <input type="hidden" [value]="hiddenId" name="hiddenId" #hiddenId/>
+              <input
+                type="hidden"
+                [value]="hiddenId"
+                name="hiddenId"
+                #hiddenId
+              />
               <b><label> Book Name: </label></b>
               <input
                 type="text"

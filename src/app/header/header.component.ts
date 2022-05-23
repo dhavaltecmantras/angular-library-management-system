@@ -1,5 +1,5 @@
 import { TokenStorageService } from './../_services/token-storage.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent implements OnInit {
+  @Input() userName: string = '';
   constructor(private tokenStorageService: TokenStorageService) {}
 
   ngOnInit(): void {}

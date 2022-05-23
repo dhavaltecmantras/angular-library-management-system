@@ -1,3 +1,4 @@
+import { TokenStorageService } from './../_services/token-storage.service';
 import { BookService } from './../_services/book.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -20,6 +21,9 @@ export class DashboardComponent implements OnInit {
   errorMessage = '';
   gridData = [];
   hiddenId: any;
+  userDetails: any;
+  userName: string = '';
+
   addBookFormData = {
     id: '',
     book_name: '',
@@ -30,7 +34,8 @@ export class DashboardComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     toaster: ToastrService,
-    private BookService: BookService
+    private BookService: BookService,
+    private tokenStorage: TokenStorageService
   ) {
     this.toaster = toaster;
   }
@@ -43,6 +48,8 @@ export class DashboardComponent implements OnInit {
       quantity: ['', Validators.required],
     });
     this.getBookDetails();
+    this.userDetails = this.tokenStorage.getUser();
+    this.userName = this.userDetails.user.name;
   }
 
   openPopup() {
