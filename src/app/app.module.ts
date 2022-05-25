@@ -14,6 +14,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { AuthInterceptor } from './_helper/auth.interceptor';
 import { GridModule } from '@progress/kendo-angular-grid';
+import { GetBookStatusPipe } from './_pipes/get-book-status.pipe';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { GridModule } from '@progress/kendo-angular-grid';
     DashboardComponent,
     HeaderComponent,
     ProfileComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    GetBookStatusPipe
   ],
   imports: [
     BrowserModule,

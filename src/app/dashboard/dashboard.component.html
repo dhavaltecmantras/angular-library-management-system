@@ -4,15 +4,17 @@
       <app-header [userName]="userName"></app-header>
     </div>
   </div>
+
+  <!-- HTML for admin -->
   <div class="row" *ngIf="this.userDetails.user.role == 1">
-    <div
+    <!-- <div
       class="col-lg-3 mb-3 d-flex align-items-stretch"
       style="margin-top: 5%"
     >
       <div class="card h-100"></div>
-    </div>
+    </div> -->
     <div
-      class="col-lg-9 mb-3 d-flex align-items-stretch"
+      class="col-lg-12 mb-3 d-flex align-items-stretch"
       style="margin-top: 5%"
     >
       <div class="card h-100">
@@ -30,11 +32,7 @@
           <br />
           <div class="row">
             <div class="col-lg-12">
-              <kendo-grid
-                [data]="gridData"
-                [pageSize]="5"
-                [pageable]="true"
-              >
+              <kendo-grid [data]="gridData" [pageSize]="5" [pageable]="true">
                 <kendo-grid-column field="id" title="ID"> </kendo-grid-column>
                 <kendo-grid-column field="book_name" title="Book Name">
                 </kendo-grid-column>
@@ -74,6 +72,86 @@
     </div>
   </div>
 
+  <!-- HTML for Book Care Taker -->
+  <div class="row" *ngIf="this.userDetails.user.role == 3">
+    <div
+      class="col-lg-12 mb-3 d-flex align-items-stretch"
+      style="margin-top: 5%"
+    >
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title">Issue Book(s)</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-2">
+              <button (click)="openPopup()" class="btn btn-primary float-right">
+                Issue book(s)
+              </button>
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="col-lg-12">
+              <kendo-grid [data]="gridData" [pageSize]="5" [pageable]="true">
+                <kendo-grid-column field="id" title="ID"> </kendo-grid-column>
+                <kendo-grid-column field="book_id" title="Book ID">
+                </kendo-grid-column>
+                <kendo-grid-column field="book_name" title="Book Name">
+                </kendo-grid-column>
+                <kendo-grid-column
+                  field="issuer_name"
+                  title="Who issued book(s)"
+                >
+                </kendo-grid-column>
+                <kendo-grid-column field="user_name" title="User Name">
+                </kendo-grid-column>
+                <kendo-grid-column field="user_address" title="User Address">
+                </kendo-grid-column>
+                <kendo-grid-column
+                  field="user_phone_number"
+                  title="User Phone Number"
+                >
+                </kendo-grid-column>
+                <kendo-grid-column field="user_email" title="User Email">
+                </kendo-grid-column>
+                <kendo-grid-column field="penalty" title="Penalty">
+                </kendo-grid-column>
+                <kendo-grid-column field="status" title="Status">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    {{ dataItem.status | getBookStatus }}
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="notes" title="Notes">
+                </kendo-grid-column>
+                <kendo-grid-column
+                  field="issued_quantity"
+                  title="Total Quantity Issued"
+                >
+                </kendo-grid-column>
+                <kendo-grid-column field="created_at" title="Issued Date">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    {{ dataItem.created_at | date: "MM/d/yyyy, h:mm a" }}
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="created_at" title="Action">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    <button
+                      class="btn btn-success"
+                      (click)="editIssuedBookLog(dataItem.id)"
+                    >
+                      Edit
+                    </button>
+                  </ng-template>
+                </kendo-grid-column>
+              </kendo-grid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Bootstrap Model Popup Start -->
   <div
     class="modal bd-example-modal-lg"
@@ -85,6 +163,7 @@
     <form
       name="form"
       [formGroup]="addBookDetailsForm"
+      *ngIf="this.userDetails.user.role == 1"
       (ngSubmit)="action == 'insert' ? addBookDetails() : updateBookDetails()"
     >
       <div class="modal-dialog modal-lg" role="document">
@@ -189,6 +268,404 @@
         </div>
       </div>
     </form>
+
+    <form
+      name="form"
+      [formGroup]="addIssuedBookDetailsForm"
+      *ngIf="this.userDetails.user.role == 3 && action == 'insert'"
+      (ngSubmit)="addIssuedBookLogs()"
+    >
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Issue book(s)</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <input
+                type="hidden"
+                [value]="hiddenId"
+                name="hiddenId"
+                #hiddenId
+              />
+              <b><label> Select Book: </label></b>
+              <select
+                name="book_name"
+                class="form-control"
+                formControlName="book_id"
+                (change)="getTotalQuantityOfBook()"
+                [(ngModel)]="addIssuedBookLogsFormData"
+              >
+                <option *ngFor="let data of totalBooksArray" [ngValue]="data">
+                  {{ data.book_name }}
+                </option>
+              </select>
+              <div
+                *ngIf="submitted && f['book_name'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['book_name'].errors['required']">
+                  Book Name is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> User's Name: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_name"
+                [(ngModel)]="addIssuedBookDetailsForm.user_name"
+                placeholder="Enter User's Phone Number"
+                [ngClass]="{
+                  'is-invalid': submitted && f['user_name'].errors
+                }"
+              />
+              <div
+                *ngIf="submitted && f['user_name'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['user_name'].errors['required']">
+                  User's name is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> User's Address: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_address"
+                [(ngModel)]="addIssuedBookDetailsForm.user_address"
+                placeholder="Enter User's Phone Number"
+                [ngClass]="{
+                  'is-invalid': submitted && f['user_address'].errors
+                }"
+              />
+              <div
+                *ngIf="submitted && f['user_address'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['user_address'].errors['required']">
+                  User's Address is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> User's Contact Number: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_phone_number"
+                [(ngModel)]="addIssuedBookDetailsForm.user_phone_number"
+                placeholder="Enter User's Phone Number"
+                [ngClass]="{
+                  'is-invalid': submitted && f['user_phone_number'].errors
+                }"
+              />
+              <div
+                *ngIf="submitted && f['user_phone_number'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['user_phone_number'].errors['required']">
+                  User's Address is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> User's Email Address: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_email"
+                [(ngModel)]="addIssuedBookDetailsForm.user_email"
+                placeholder="Enter User's Email Address"
+                [ngClass]="{
+                  'is-invalid': submitted && f['user_email'].errors
+                }"
+              />
+              <div
+                *ngIf="submitted && f['user_email'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['user_email'].errors['required']">
+                  User's Email Address is required.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> Additional Notes: </label></b>
+              <textarea
+                class="form-control"
+                rows="5"
+                formControlName="notes"
+                [(ngModel)]="addIssuedBookDetailsForm.notes"
+                placeholder="Add additional notes"
+                [ngClass]="{
+                  'is-invalid': submitted && f['notes'].errors
+                }"
+              ></textarea>
+              <div
+                *ngIf="submitted && f['notes'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['notes'].errors['required']">
+                  User's Address is required.
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="form-group mt-3"
+              *ngIf="totalBookQuantityArray.length > 0"
+            >
+              <b><label> Total Issued Quantity: </label></b>
+              <select
+                name="book_name"
+                class="form-control"
+                formControlName="issued_quantity"
+                [(ngModel)]="addIssuedBookDetailsForm.issued_quantity"
+              >
+                <option
+                  *ngFor="
+                    let data of totalBookQuantityArray;
+                    let currentElementIndex = index
+                  "
+                  [value]="currentElementIndex + 1"
+                >
+                  {{ currentElementIndex + 1 }}
+                </option>
+              </select>
+
+              <div
+                *ngIf="submitted && f['issued_quantity'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['issued_quantity'].errors['required']">
+                  Total issued quantity is required.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">
+              {{ issueBookButtonTitle }}
+            </button>
+            <button type="button" class="btn btn-danger" (click)="closePopup()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <form
+      name="form"
+      *ngIf="this.userDetails.user.role == 3 && action != 'insert'"
+      (ngSubmit)="addIssuedBookLogs()"
+    >
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Change Status</h4>
+          </div>
+          <div class="modal-body">
+
+            <div class="form-group mt-3">
+              <b><label> User's Name: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_name"
+                [(ngModel)]="addIssuedBookLogsFormData.user_name"
+                placeholder="Enter User's Phone Number"
+                readonly
+              />
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> User's Address: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_address"
+                [(ngModel)]="addIssuedBookLogsFormData.user_address"
+                placeholder="Enter User's Phone Number"
+                readonly
+              />
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> User's Contact Number: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_phone_number"
+                [(ngModel)]="addIssuedBookLogsFormData.user_phone_number"
+                placeholder="Enter User's Phone Number"
+                readonly
+              />
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> User's Email Address: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_email"
+                [(ngModel)]="addIssuedBookLogsFormData.user_email"
+                placeholder="Enter User's Email Address"
+                readonly
+              />
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> Additional Notes: </label></b>
+              <textarea
+                class="form-control"
+                rows="5"
+                formControlName="notes"
+                [(ngModel)]="addIssuedBookLogsFormData.notes"
+                placeholder="Add additional notes"
+                readonly
+              ></textarea>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">
+              {{ issueBookButtonTitle }}
+            </button>
+            <button type="button" class="btn btn-danger" (click)="closePopup()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
+  <!-- Bootstrap Model Popup End -->
+
+  <!-- Bootstrap Model Popup Start -->
+  <!-- <div
+    class="modal bd-example-modal-lg"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="true"
+    [ngStyle]="{ display: displayStyle }"
+  >
+    <form
+      name="form"
+      [formGroup]="addBookDetailsForm"
+      (ngSubmit)="action == 'insert' ? addBookDetails() : updateBookDetails()"
+    >
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Add All Details</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <input
+                type="hidden"
+                [value]="hiddenId"
+                name="hiddenId"
+                #hiddenId
+              />
+              <b><label> Book Name: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="book_name"
+                [(ngModel)]="addBookFormData.book_name"
+                placeholder="Enter Book Name"
+                [ngClass]="{ 'is-invalid': submitted && f['book_name'].errors }"
+              />
+              <div
+                *ngIf="submitted && f['book_name'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['book_name'].errors['required']">
+                  Book Name is required.
+                </div>
+              </div>
+            </div>
+            <div class="form-group mt-3">
+              <b><label> Description: </label></b>
+              <textarea
+                class="form-control"
+                rows="5"
+                formControlName="description"
+                [(ngModel)]="addBookFormData.description"
+                placeholder="Enter Books Description"
+                [ngClass]="{
+                  'is-invalid': submitted && f['description'].errors
+                }"
+              ></textarea>
+              <div
+                *ngIf="submitted && f['description'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['description'].errors['required']">
+                  Description is required.
+                </div>
+              </div>
+            </div>
+            <div class="form-group mt-3">
+              <b><label> Price: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="price"
+                [(ngModel)]="addBookFormData.price"
+                placeholder="Enter Book Price"
+                [ngClass]="{ 'is-invalid': submitted && f['price'].errors }"
+              />
+              <div
+                *ngIf="submitted && f['price'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['price'].errors['required']">
+                  Book Price is required.
+                </div>
+              </div>
+            </div>
+            <div class="form-group mt-3">
+              <b><label> Quantity: </label></b>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="quantity"
+                [(ngModel)]="addBookFormData.quantity"
+                placeholder="Enter Total Quantity"
+                [ngClass]="{ 'is-invalid': submitted && f['quantity'].errors }"
+              />
+              <div
+                *ngIf="submitted && f['quantity'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['quantity'].errors['required']">
+                  Book quantity is required.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">
+              {{ buttonTitle }}
+            </button>
+            <button type="button" class="btn btn-danger" (click)="closePopup()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div> -->
   <!-- Bootstrap Model Popup End -->
 </div>
