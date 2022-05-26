@@ -115,10 +115,16 @@ export class DashboardComponent implements OnInit {
     this.userName = this.userDetails.user.name;
   }
 
+  /**
+   * To open the model popup.
+   */
   openPopup() {
     this.displayStyle = 'block';
   }
 
+  /**
+   * TO close the model popup.
+   */
   closePopup() {
     this.displayStyle = 'none';
     if (this.userRole == ROLE_ADMIN) {
@@ -131,12 +137,19 @@ export class DashboardComponent implements OnInit {
     this.action = 'insert';
   }
 
+  /**
+   * Function is used to get the form data based on role.
+   */
   get f() {
     return this.userDetails.user.role == ROLE_ADMIN
       ? this.addBookDetailsForm.controls
       : this.addIssuedBookDetailsForm.controls;
   }
 
+  /**
+   * Function is used to add book details.
+   * @returns
+   */
   addBookDetails(): void {
     this.submitted = true;
     if (this.addBookDetailsForm.invalid) {
@@ -160,6 +173,9 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * This function is used to get all book details.
+   */
   getBookDetails(): void {
     this.BookService.getBookDetails().subscribe(
       (data) => {
@@ -171,6 +187,10 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * To get the book details by book id.
+   * @param id
+   */
   editBookDetails(id: any) {
     this.BookService.getBookDetailsById(id).subscribe(
       (data) => {
@@ -195,6 +215,10 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * To delete the book details.
+   * @param id
+   */
   deleteBookDetails(id: any) {
     Swal.fire({
       title: 'Are you sure want to DELETE?',
@@ -227,6 +251,9 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  /**
+   * This function is being used for updating book details.
+   */
   updateBookDetails(): void {
     this.submitted = true;
     if (this.addBookDetailsForm.invalid) {
@@ -250,6 +277,9 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * Function is used to get total quantity of books.
+   */
   getTotalQuantityOfBook() {
     let selectedBookId = parseInt(this.addIssuedBookLogsFormData.id);
 
@@ -270,6 +300,10 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * Function is used to add store issued book logs.
+   * @returns
+   */
   addIssuedBookLogs(): void {
     this.submitted = true;
     if (this.addIssuedBookDetailsForm.invalid) {
@@ -308,6 +342,9 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * To get all the data of issued book logs.
+   */
   getIssuedBookLogs() {
     this.issuedBookLogsService.getIssuedBookLogs().subscribe(
       (data) => {
@@ -319,6 +356,10 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * Function is used to get book log by id.
+   * @param id
+   */
   editIssuedBookLog(id: number) {
     this.issuedBookLogsService.getBookLogsById(id).subscribe(
       (data) => {
@@ -349,6 +390,9 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * This function is used the book logs.
+   */
   updateIssuedBookLogs() {
     let data = this.addIssuedBookLogsFormData;
     this.issuedBookLogsService.updateIssuedBookLogs(data).subscribe(
@@ -368,6 +412,10 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  /**
+   * This function is used to calculate penalty on issued books.
+   * @param data
+   */
   calculatePenalty(data: any) {
     this.issuedBookLogsService.calculatePenalty(data).subscribe(
       (data) => {
@@ -378,7 +426,9 @@ export class DashboardComponent implements OnInit {
         }
         this.getIssuedBookLogs();
       },
-      (error) => {}
+      (error) => {
+        this.toaster.error("Something went wrong.");
+      }
     );
   }
 }
