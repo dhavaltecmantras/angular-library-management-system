@@ -34,7 +34,7 @@
             <div class="col-lg-12">
               <kendo-grid
                 [kendoGridBinding]="gridData"
-                [pageSize]="5"
+                [pageSize]="10"
                 [pageable]="true"
                 [sortable]="true"
                 [reorderable]="true"
@@ -51,6 +51,8 @@
                 <kendo-grid-column field="price" title="Price">
                 </kendo-grid-column>
                 <kendo-grid-column field="quantity" title="Quantity">
+                </kendo-grid-column>
+                <kendo-grid-column field="penalty" title="Penalty">
                 </kendo-grid-column>
                 <kendo-grid-column field="created_at" title="Created At">
                   <ng-template kendoGridCellTemplate let-dataItem>
@@ -200,11 +202,6 @@
                 [height]="700"
               >
                 <ng-template kendoGridToolbarTemplate>
-                  <!-- <input
-                    placeholder="Search in all columns..."
-                    kendoTextBox
-                    (input)="onFilter($event.target.value)"
-                  /> -->
                   <kendo-grid-spacer></kendo-grid-spacer>
                   <button kendoGridExcelCommand type="button" icon="file-excel">
                     Export to Excel
@@ -234,7 +231,7 @@
                 </kendo-grid-column>
                 <kendo-grid-column field="user_email" title="User Email">
                 </kendo-grid-column>
-                <kendo-grid-column field="penalty" title="Penalty">
+                <kendo-grid-column field="penalty" title="Total Penalty">
                 </kendo-grid-column>
                 <kendo-grid-column field="status" title="Status">
                   <ng-template kendoGridCellTemplate let-dataItem>
@@ -266,6 +263,13 @@
                       (click)="editIssuedBookLog(dataItem.id)"
                     >
                       Edit
+                    </button>&nbsp;
+                    <button
+                      *ngIf="dataItem.status != 3"
+                      class="btn btn-success"
+                      (click)="calculatePenalty(dataItem)"
+                    >
+                      Calculate Penalty
                     </button>
                     <p *ngIf="dataItem.status == 3">-</p>
                   </ng-template>
@@ -379,6 +383,25 @@
               >
                 <div *ngIf="f['quantity'].errors['required']">
                   Book quantity is required.
+                </div>
+              </div>
+            </div>
+            <div class="form-group mt-3">
+              <b><label> Penalty: </label></b>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="penalty"
+                [(ngModel)]="addBookFormData.penalty"
+                placeholder="Enter Total Penalty If Book Will Not Get Return On Time"
+                [ngClass]="{ 'is-invalid': submitted && f['penalty'].errors }"
+              />
+              <div
+                *ngIf="submitted && f['penalty'].errors"
+                class="invalid-feedback"
+              >
+                <div *ngIf="f['penalty'].errors['required']">
+                  Book penalty is required.
                 </div>
               </div>
             </div>

@@ -39,4 +39,13 @@ export class IssuedBookLogsService {
       HTTP_OPTIONS
     );
   }
+
+  /**
+   * This function is used to calculate penalty.
+   * @param data
+   * @returns
+   */
+  calculatePenalty(data = {}): Observable<any> {
+    return this.http.post(API_URL + 'calculate-penalty', data, HTTP_OPTIONS);
+  }
 }

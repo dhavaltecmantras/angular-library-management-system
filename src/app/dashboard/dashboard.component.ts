@@ -5,6 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, Validators, FormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
+import { formatDate } from '@angular/common';
+import { drawDOM } from '@progress/kendo-drawing';
 
 const ROLE_ADMIN = 1;
 const ROLE_BOOK_KEEPER = 2;
@@ -33,19 +35,20 @@ export class DashboardComponent implements OnInit {
   totalBookQuantityArray: number[] = [];
   issueBookButtonTitle: String = 'Issue book(s)';
   userRole: number = 0;
+
   allStatus = [
     {
       value: 1,
-      text: 'Issued'
+      text: 'Issued',
     },
     {
       value: 2,
-      text: 'Penalty Applied'
+      text: 'Penalty Applied',
     },
     {
       value: 3,
-      text: 'Received'
-    }
+      text: 'Received',
+    },
   ];
 
   addBookFormData = {
@@ -54,6 +57,7 @@ export class DashboardComponent implements OnInit {
     description: '',
     price: '',
     quantity: '',
+    penalty: '',
   };
 
   addIssuedBookLogsFormData: any = {
@@ -68,7 +72,7 @@ export class DashboardComponent implements OnInit {
     user_email: '',
     notes: '',
     issued_quantity: '',
-    status: 0
+    status: 0,
   };
 
   constructor(
@@ -85,12 +89,14 @@ export class DashboardComponent implements OnInit {
     this.userDetails = this.tokenStorage.getUser();
     this.userRole = this.userDetails.user.role;
     this.getBookDetails();
+    // this.calculatePreviosDate();
     if (this.userDetails.user.role == ROLE_ADMIN) {
       this.addBookDetailsForm = this.formBuilder.group({
         book_name: ['', Validators.required],
         description: ['', Validators.required],
         price: ['', Validators.required],
         quantity: ['', Validators.required],
+        penalty: ['', Validators.required],
       });
     } else {
       this.getIssuedBookLogs();
@@ -178,6 +184,7 @@ export class DashboardComponent implements OnInit {
             description: data.description,
             price: data.price,
             quantity: data.quantity,
+            penalty: data.penalty,
           };
           this.openPopup();
         }
@@ -282,7 +289,7 @@ export class DashboardComponent implements OnInit {
       user_email: this.addIssuedBookDetailsForm.user_email,
       notes: this.addIssuedBookDetailsForm.notes,
       issued_quantity: this.addIssuedBookDetailsForm.issued_quantity,
-      status: 1
+      status: 1,
     };
 
     this.issuedBookLogsService.addIssuedBookLogs(data).subscribe(
@@ -349,13 +356,29 @@ export class DashboardComponent implements OnInit {
         if (data.success) {
           data = data.data.data;
           this.getIssuedBookLogs();
-          this.toaster.success('You have successfully updated issued book status.');
+          this.toaster.success(
+            'You have successfully updated issued book status.'
+          );
           this.closePopup();
         }
       },
       (error) => {
         this.toaster.error('Something is wrong');
       }
+    );
+  }
+
+  calculatePenalty(data: any) {
+    this.issuedBookLogsService.calculatePenalty(data).subscribe(
+      (data) => {
+        if (data.success && data.data.success) {
+          this.toaster.success(data.message);
+        } else {
+          this.toaster.error(data.data.message);
+        }
+        this.getIssuedBookLogs();
+      },
+      (error) => {}
     );
   }
 }
