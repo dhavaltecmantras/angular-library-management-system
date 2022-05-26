@@ -2,7 +2,7 @@ import { IssuedBookLogsService } from './../_services/issued-book-logs.service';
 import { TokenStorageService } from './../_services/token-storage.service';
 import { BookService } from './../_services/book.service';
 import { ToastrService } from 'ngx-toastr';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators, FormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
 
@@ -33,6 +33,20 @@ export class DashboardComponent implements OnInit {
   totalBookQuantityArray: number[] = [];
   issueBookButtonTitle: String = 'Issue book(s)';
   userRole: number = 0;
+  allStatus = [
+    {
+      value: 1,
+      text: 'Issued'
+    },
+    {
+      value: 2,
+      text: 'Penalty Applied'
+    },
+    {
+      value: 3,
+      text: 'Received'
+    }
+  ];
 
   addBookFormData = {
     id: '',
@@ -42,8 +56,9 @@ export class DashboardComponent implements OnInit {
     quantity: '',
   };
 
-  addIssuedBookLogsFormData = {
+  addIssuedBookLogsFormData: any = {
     id: '',
+    book_id: '',
     book_name: '',
     issuer_id: '',
     issuer_name: '',
@@ -53,6 +68,7 @@ export class DashboardComponent implements OnInit {
     user_email: '',
     notes: '',
     issued_quantity: '',
+    status: 0
   };
 
   constructor(
@@ -87,6 +103,7 @@ export class DashboardComponent implements OnInit {
         user_email: ['', Validators.required],
         notes: ['', Validators.required],
         issued_quantity: ['', Validators.required],
+        status: 0,
       });
     }
     this.userName = this.userDetails.user.name;
@@ -102,7 +119,8 @@ export class DashboardComponent implements OnInit {
       this.addBookDetailsForm.reset();
       this.buttonTitle = 'Add Book Details';
     } else {
-      this.buttonTitle = 'Update Status';
+      this.addIssuedBookDetailsForm.reset();
+      this.buttonTitle = 'Issue Book(s)';
     }
     this.action = 'insert';
   }
@@ -251,6 +269,7 @@ export class DashboardComponent implements OnInit {
       this.toaster.error('All fields are required.');
       return;
     }
+    this.buttonTitle = 'Issue Book(s)';
 
     let data = {
       book_id: this.addIssuedBookLogsFormData.id,
@@ -263,6 +282,7 @@ export class DashboardComponent implements OnInit {
       user_email: this.addIssuedBookDetailsForm.user_email,
       notes: this.addIssuedBookDetailsForm.notes,
       issued_quantity: this.addIssuedBookDetailsForm.issued_quantity,
+      status: 1
     };
 
     this.issuedBookLogsService.addIssuedBookLogs(data).subscribe(
@@ -299,10 +319,11 @@ export class DashboardComponent implements OnInit {
           data = data.data.data;
           this.action = 'update';
           this.addIssuedBookLogsFormData = {
-            id: '',
-            book_name: '',
-            issuer_id: '',
-            issuer_name: '',
+            id: data.id,
+            book_id: data.book_id,
+            book_name: data.book_name,
+            issuer_id: data.issuer_id,
+            issuer_name: data.issuer_name,
             user_name: data.user_name,
             user_address: data.user_address,
             user_phone_number: data.user_phone_number,
@@ -311,6 +332,25 @@ export class DashboardComponent implements OnInit {
             issued_quantity: data.issued_quantity,
           };
           this.openPopup();
+          this.addIssuedBookLogsFormData.status = data.status;
+          this.issueBookButtonTitle = 'Update Issued Book';
+        }
+      },
+      (error) => {
+        this.toaster.error('Something is wrong');
+      }
+    );
+  }
+
+  updateIssuedBookLogs() {
+    let data = this.addIssuedBookLogsFormData;
+    this.issuedBookLogsService.updateIssuedBookLogs(data).subscribe(
+      (data) => {
+        if (data.success) {
+          data = data.data.data;
+          this.getIssuedBookLogs();
+          this.toaster.success('You have successfully updated issued book status.');
+          this.closePopup();
         }
       },
       (error) => {

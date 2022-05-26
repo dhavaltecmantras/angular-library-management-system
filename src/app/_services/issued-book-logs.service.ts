@@ -31,4 +31,12 @@ export class IssuedBookLogsService {
   getBookLogsById(id: number): Observable<any> {
     return this.http.get(`${API_URL}get-book-log-by-id/${id}`, HTTP_OPTIONS);
   }
+
+  updateIssuedBookLogs(data = {}): Observable<any> {
+    return this.http.post(
+      API_URL + 'update-issued-book-logs',
+      data,
+      HTTP_OPTIONS
+    );
+  }
 }

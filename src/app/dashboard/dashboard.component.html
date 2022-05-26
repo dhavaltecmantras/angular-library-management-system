@@ -32,7 +32,17 @@
           <br />
           <div class="row">
             <div class="col-lg-12">
-              <kendo-grid [data]="gridData" [pageSize]="5" [pageable]="true">
+              <kendo-grid
+                [kendoGridBinding]="gridData"
+                [pageSize]="5"
+                [pageable]="true"
+                [sortable]="true"
+                [reorderable]="true"
+                [resizable]="true"
+                [columnMenu]="{ filter: true }"
+                [pageable]="true"
+                [height]="700"
+              >
                 <kendo-grid-column field="id" title="ID"> </kendo-grid-column>
                 <kendo-grid-column field="book_name" title="Book Name">
                 </kendo-grid-column>
@@ -72,28 +82,29 @@
     </div>
   </div>
 
-  <!-- HTML for Book Care Taker -->
-  <div class="row" *ngIf="this.userDetails.user.role == 3">
+  <div class="row" *ngIf="this.userDetails.user.role == 2">
     <div
       class="col-lg-12 mb-3 d-flex align-items-stretch"
       style="margin-top: 5%"
     >
       <div class="card h-100">
         <div class="card-header">
-          <h5 class="card-title">Issue Book(s)</h5>
+          <h5 class="card-title">Total Issued Book(s)</h5>
         </div>
         <div class="card-body">
           <div class="row">
-            <div class="col-lg-2">
-              <button (click)="openPopup()" class="btn btn-primary float-right">
-                Issue book(s)
-              </button>
-            </div>
-          </div>
-          <br />
-          <div class="row">
             <div class="col-lg-12">
-              <kendo-grid [data]="gridData" [pageSize]="5" [pageable]="true">
+              <kendo-grid
+                [kendoGridBinding]="gridData"
+                [pageSize]="5"
+                [pageable]="true"
+                [sortable]="true"
+                [reorderable]="true"
+                [resizable]="true"
+                [columnMenu]="{ filter: true }"
+                [pageable]="true"
+                [height]="700"
+              >
                 <kendo-grid-column field="id" title="ID"> </kendo-grid-column>
                 <kendo-grid-column field="book_id" title="Book ID">
                 </kendo-grid-column>
@@ -134,7 +145,11 @@
                     {{ dataItem.created_at | date: "MM/d/yyyy, h:mm a" }}
                   </ng-template>
                 </kendo-grid-column>
-                <kendo-grid-column field="created_at" title="Action">
+                <kendo-grid-column
+                  field="created_at"
+                  title="Action"
+                  *ngIf="userDetails.user.role != 2"
+                >
                   <ng-template kendoGridCellTemplate let-dataItem>
                     <button
                       class="btn btn-success"
@@ -142,6 +157,117 @@
                     >
                       Edit
                     </button>
+                  </ng-template>
+                </kendo-grid-column>
+              </kendo-grid>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HTML for Book Care Taker -->
+  <div class="row" *ngIf="this.userDetails.user.role == 3">
+    <div
+      class="col-lg-12 mb-3 d-flex align-items-stretch"
+      style="margin-top: 5%"
+    >
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title">Issue Book(s)</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-2">
+              <button (click)="openPopup()" class="btn btn-primary float-right">
+                Issue book(s)
+              </button>
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="col-lg-12">
+              <kendo-grid
+                [kendoGridBinding]="gridData"
+                [pageSize]="5"
+                [pageable]="true"
+                [sortable]="true"
+                [reorderable]="true"
+                [resizable]="true"
+                [columnMenu]="{ filter: true }"
+                [pageable]="true"
+                [height]="700"
+              >
+                <ng-template kendoGridToolbarTemplate>
+                  <!-- <input
+                    placeholder="Search in all columns..."
+                    kendoTextBox
+                    (input)="onFilter($event.target.value)"
+                  /> -->
+                  <kendo-grid-spacer></kendo-grid-spacer>
+                  <button kendoGridExcelCommand type="button" icon="file-excel">
+                    Export to Excel
+                  </button>
+                  <button kendoGridPDFCommand icon="file-pdf">
+                    Export to PDF
+                  </button>
+                </ng-template>
+                <kendo-grid-column field="id" title="ID"> </kendo-grid-column>
+                <kendo-grid-column field="book_id" title="Book ID">
+                </kendo-grid-column>
+                <kendo-grid-column field="book_name" title="Book Name">
+                </kendo-grid-column>
+                <kendo-grid-column
+                  field="issuer_name"
+                  title="Who issued book(s)"
+                >
+                </kendo-grid-column>
+                <kendo-grid-column field="user_name" title="User Name">
+                </kendo-grid-column>
+                <kendo-grid-column field="user_address" title="User Address">
+                </kendo-grid-column>
+                <kendo-grid-column
+                  field="user_phone_number"
+                  title="User Phone Number"
+                >
+                </kendo-grid-column>
+                <kendo-grid-column field="user_email" title="User Email">
+                </kendo-grid-column>
+                <kendo-grid-column field="penalty" title="Penalty">
+                </kendo-grid-column>
+                <kendo-grid-column field="status" title="Status">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    {{ dataItem.status | getBookStatus }}
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="notes" title="Notes">
+                </kendo-grid-column>
+                <kendo-grid-column
+                  field="issued_quantity"
+                  title="Total Quantity Issued"
+                >
+                </kendo-grid-column>
+                <kendo-grid-column field="created_at" title="Issued Date">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    {{ dataItem.created_at | date: "MM/d/yyyy, h:mm a" }}
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="created_at" title="Last updated on">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    {{ dataItem.updated_at | date: "MM/d/yyyy, h:mm a" }}
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="created_at" title="Action">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    <button
+                      *ngIf="dataItem.status != 3"
+                      class="btn btn-success"
+                      (click)="editIssuedBookLog(dataItem.id)"
+                    >
+                      Edit
+                    </button>
+                    <p *ngIf="dataItem.status == 3">-</p>
                   </ng-template>
                 </kendo-grid-column>
               </kendo-grid>
@@ -466,16 +592,21 @@
 
     <form
       name="form"
-      *ngIf="this.userDetails.user.role == 3 && action != 'insert'"
-      (ngSubmit)="addIssuedBookLogs()"
+      [formGroup]="addIssuedBookDetailsForm"
+      *ngIf="this.userDetails.user.role == 3 && this.action == 'update'"
+      (ngSubmit)="updateIssuedBookLogs()"
     >
+      <input
+        type="hidden"
+        formControlName="book_id"
+        [(ngModel)]="addIssuedBookLogsFormData.book_id"
+      />
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title">Change Status</h4>
           </div>
           <div class="modal-body">
-
             <div class="form-group mt-3">
               <b><label> User's Name: </label></b>
               <input
@@ -536,6 +667,18 @@
               ></textarea>
             </div>
 
+            <div class="form-group mt-3">
+              <b><label> Change Status: </label></b>
+              <select
+                class="form-control"
+                formControlName="status"
+                [(ngModel)]="addIssuedBookLogsFormData.status"
+              >
+                <option *ngFor="let status of allStatus" [value]="status.value">
+                  {{ status.text }}
+                </option>
+              </select>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-primary">
