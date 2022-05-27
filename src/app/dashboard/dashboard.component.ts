@@ -169,6 +169,7 @@ export class DashboardComponent implements OnInit {
       (error) => {
         this.closePopup();
         this.toaster.error(error.message);
+        location.reload();
       }
     );
   }
@@ -179,7 +180,9 @@ export class DashboardComponent implements OnInit {
   getBookDetails(): void {
     this.BookService.getBookDetails().subscribe(
       (data) => {
-        this.gridData = this.totalBooksArray = data.data.data;
+        if (data.data) {
+          this.gridData = this.totalBooksArray = data.data.data;
+        }
       },
       (error) => {
         this.toaster.error('Something is wrong');
@@ -243,6 +246,7 @@ export class DashboardComponent implements OnInit {
           },
           (error) => {
             this.toaster.error('Something is wrong');
+            location.reload();
           }
         );
       } else if (result.dismiss === Swal.DismissReason.cancel) {

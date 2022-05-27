@@ -1,4 +1,5 @@
-import { NgModule } from '@angular/core';
+import { GetUserDetailsService } from './get-user-details.service';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -16,6 +17,9 @@ import { AuthInterceptor } from './_helper/auth.interceptor';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { GetBookStatusPipe } from './_pipes/get-book-status.pipe';
 
+// export function getUserDetails(getUserDetailsService: GetUserDetailsService) {
+//   return () => getUserDetailsService.init();
+// }
 
 @NgModule({
   declarations: [
@@ -25,7 +29,7 @@ import { GetBookStatusPipe } from './_pipes/get-book-status.pipe';
     HeaderComponent,
     ProfileComponent,
     PageNotFoundComponent,
-    GetBookStatusPipe
+    GetBookStatusPipe,
   ],
   imports: [
     BrowserModule,
@@ -34,11 +38,18 @@ import { GetBookStatusPipe } from './_pipes/get-book-status.pipe';
     ReactiveFormsModule,
     ToastrModule.forRoot(),
     BrowserAnimationsModule,
-    GridModule
+    GridModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (getUserDetailsService: GetUserDetailsService) =>
+        () => getUserDetailsService.init(),
+      deps: [GetUserDetailsService],
+      multi: true,
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
