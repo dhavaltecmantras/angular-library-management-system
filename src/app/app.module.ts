@@ -17,10 +17,6 @@ import { AuthInterceptor } from './_helper/auth.interceptor';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { GetBookStatusPipe } from './_pipes/get-book-status.pipe';
 
-// export function getUserDetails(getUserDetailsService: GetUserDetailsService) {
-//   return () => getUserDetailsService.init();
-// }
-
 @NgModule({
   declarations: [
     AppComponent,

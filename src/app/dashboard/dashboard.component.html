@@ -1,7 +1,10 @@
 <div class="container-fluid">
   <div class="row w-100">
     <div class="col-lg-12">
-      <app-header [userName]="userName"></app-header>
+      <app-header
+        [userName]="userName"
+        (displayStyleForModel)="displayStyleForModel($event)"
+      ></app-header>
     </div>
   </div>
 
@@ -25,14 +28,14 @@
           <div class="row">
             <div class="col-lg-2">
               <button (click)="openPopup()" class="btn btn-primary float-right">
-                Add Book Details
+                <i class="fa fa-plus" aria-hidden="true"></i> Add Book Details
               </button>
             </div>
           </div>
           <br />
           <div class="row">
             <div class="col-lg-12">
-              <kendo-grid
+              <!-- <kendo-grid
                 [kendoGridBinding]="gridData"
                 [pageSize]="10"
                 [pageable]="true"
@@ -65,18 +68,37 @@
                       class="btn btn-success"
                       (click)="editBookDetails(dataItem.id)"
                     >
-                      Edit
+                      <i class="fa fa-edit" aria-hidden="true"></i> Edit
                     </button>
                     &nbsp;
                     <button
                       class="btn btn-danger"
                       (click)="deleteBookDetails(dataItem.id)"
                     >
-                      Delete
+                      <i class="fa fa-trash" aria-hidden="true"></i> Delete
                     </button>
                   </ng-template>
                 </kendo-grid-column>
-              </kendo-grid>
+              </kendo-grid> -->
+
+              <kendo-grid
+              [kendoGridBinding]="getFormData"
+              [pageSize]="10"
+              [pageable]="true"
+              [sortable]="true"
+              [reorderable]="true"
+              [resizable]="true"
+              [columnMenu]="{ filter: true }"
+              [pageable]="true"
+              [height]="700"
+            >
+              <kendo-grid-column field="id" title="ID"> </kendo-grid-column>
+              <kendo-grid-column field="phone_number" title="Phone Number">
+              </kendo-grid-column>
+              <kendo-grid-column field="today_s_date" title="Today's Date">
+              </kendo-grid-column>
+            </kendo-grid>
+
             </div>
           </div>
         </div>
@@ -262,8 +284,8 @@
                       class="btn btn-success"
                       (click)="editIssuedBookLog(dataItem.id)"
                     >
-                      Edit
-                    </button>&nbsp;
+                      Edit</button
+                    >&nbsp;
                     <button
                       *ngIf="dataItem.status != 3"
                       class="btn btn-success"
@@ -293,7 +315,7 @@
     <form
       name="form"
       [formGroup]="addBookDetailsForm"
-      *ngIf="this.userDetails.user.role == 1"
+      *ngIf="this.userDetails.user.role == 1 && !this.displayProfilePopup"
       (ngSubmit)="action == 'insert' ? addBookDetails() : updateBookDetails()"
     >
       <div class="modal-dialog modal-lg" role="document">
@@ -408,10 +430,20 @@
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-primary">
+              <i
+                class="fa fa-plus"
+                *ngIf="action == 'insert'"
+                aria-hidden="true"
+              ></i>
+              <i
+                class="fa fa-edit"
+                *ngIf="action == 'update'"
+                aria-hidden="true"
+              ></i>
               {{ buttonTitle }}
             </button>
             <button type="button" class="btn btn-danger" (click)="closePopup()">
-              Close
+              <i class="fa fa-times" aria-hidden="true"></i> Close
             </button>
           </div>
         </div>
@@ -421,7 +453,7 @@
     <form
       name="form"
       [formGroup]="addIssuedBookDetailsForm"
-      *ngIf="this.userDetails.user.role == 3 && action == 'insert'"
+      *ngIf="this.userDetails.user.role == 3 && action == 'insert' && !this.displayProfilePopup"
       (ngSubmit)="addIssuedBookLogs()"
     >
       <div class="modal-dialog modal-lg" role="document">
@@ -616,7 +648,7 @@
     <form
       name="form"
       [formGroup]="addIssuedBookDetailsForm"
-      *ngIf="this.userDetails.user.role == 3 && this.action == 'update'"
+      *ngIf="this.userDetails.user.role == 3 && this.action == 'update' && !this.displayProfilePopup"
       (ngSubmit)="updateIssuedBookLogs()"
     >
       <input
@@ -707,6 +739,59 @@
             <button type="submit" class="btn btn-primary">
               {{ issueBookButtonTitle }}
             </button>
+            <button type="button" class="btn btn-danger" (click)="closePopup()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <form name="form" [formGroup]="profileDetailsForm" *ngIf="this.displayProfilePopup">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Pofile Details</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group mt-3">
+              <b><label> Name: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="user_name"
+                [(ngModel)]="userDetails.user.name"
+                placeholder="Enter User's Phone Number"
+                readonly
+              />
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> Email: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="email"
+                [(ngModel)]="userDetails.user.email"
+                placeholder="Enter User's Phone Number"
+                readonly
+              />
+            </div>
+
+            <div class="form-group mt-3">
+              <b><label> Role: </label></b>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="role"
+                [(ngModel)]="userDetails.user.role"
+                placeholder="Enter User's Phone Number"
+                readonly
+              />
+            </div>
+
+          </div>
+          <div class="modal-footer">
             <button type="button" class="btn btn-danger" (click)="closePopup()">
               Close
             </button>

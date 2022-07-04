@@ -1,5 +1,5 @@
 import { TokenStorageService } from './../_services/token-storage.service';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-header',
@@ -8,6 +8,8 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class HeaderComponent implements OnInit {
   @Input() userName: string = '';
+  @Output() displayStyleForModel = new EventEmitter;
+
   constructor(private tokenStorageService: TokenStorageService) {}
 
   ngOnInit(): void {}
@@ -15,5 +17,10 @@ export class HeaderComponent implements OnInit {
   doLogout() {
     this.tokenStorageService.signOut();
     window.location.reload();
+  }
+
+  getProfileDetails() {
+    this.displayStyleForModel.emit('block');
+    // this.displayStyleForModel = 'block';
   }
 }

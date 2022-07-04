@@ -25,6 +25,7 @@ export class GetUserDetailsService {
       },
       (error) => {
         this.router.navigate(['/login']);
+        this.tokenStorage.signOut();
       }
     );
   }

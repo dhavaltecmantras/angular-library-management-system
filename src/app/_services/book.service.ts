@@ -38,4 +38,8 @@ export class BookService {
   updateBookDetails(data: any): Observable<any> {
     return this.http.post(API_URL + 'update-book-details', data, HTTP_OPTIONS);
   }
+
+  getAllFormData(): Observable<any> {
+    return this.http.get(`${API_URL}get-form-data`, HTTP_OPTIONS);
+  }
 }

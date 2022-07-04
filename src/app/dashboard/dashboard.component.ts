@@ -3,7 +3,7 @@ import { TokenStorageService } from './../_services/token-storage.service';
 import { BookService } from './../_services/book.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, Validators, FormsModule } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
 import { formatDate } from '@angular/common';
 import { drawDOM } from '@progress/kendo-drawing';
@@ -35,6 +35,10 @@ export class DashboardComponent implements OnInit {
   totalBookQuantityArray: number[] = [];
   issueBookButtonTitle: String = 'Issue book(s)';
   userRole: number = 0;
+  profileDetailsForm: any;
+  displayProfilePopup: boolean = false;
+
+  getFormData: any;
 
   allStatus = [
     {
@@ -86,10 +90,17 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getAllFormData();
     this.userDetails = this.tokenStorage.getUser();
     this.userRole = this.userDetails.user.role;
     this.getBookDetails();
-    // this.calculatePreviosDate();
+
+    this.profileDetailsForm = this.formBuilder.group({
+      user_name: '',
+      email: '',
+      role: '',
+    });
+
     if (this.userDetails.user.role == ROLE_ADMIN) {
       this.addBookDetailsForm = this.formBuilder.group({
         book_name: ['', Validators.required],
@@ -135,6 +146,7 @@ export class DashboardComponent implements OnInit {
       this.buttonTitle = 'Issue Book(s)';
     }
     this.action = 'insert';
+    this.displayProfilePopup = false;
   }
 
   /**
@@ -431,8 +443,22 @@ export class DashboardComponent implements OnInit {
         this.getIssuedBookLogs();
       },
       (error) => {
-        this.toaster.error("Something went wrong.");
+        this.toaster.error('Something went wrong.');
       }
+    );
+  }
+
+  displayStyleForModel(data: any) {
+    this.displayStyle = data;
+    this.displayProfilePopup = true;
+  }
+
+  getAllFormData() {
+    this.BookService.getAllFormData().subscribe(
+      (data) => {
+        this.getFormData = data;
+      },
+      (error) => {}
     );
   }
 }

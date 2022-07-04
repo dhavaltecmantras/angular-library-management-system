@@ -5,8 +5,11 @@
     >
     <ul class="navbar-nav px-3">
       <li class="nav-item text-nowrap">
+        <span class="user-profile" (click)="getProfileDetails()">
+          <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+        </span>
         <button class="nav-link" (click)="doLogout()" class="btn btn-secondary">
-          Logout
+          <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
         </button>
       </li>
     </ul>
